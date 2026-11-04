@@ -38,6 +38,7 @@ h1{ font-size:clamp(22px,5.4vw,30px); margin:4px 0 8px; }
 .decide{ display:block; width:100%; margin:0 0 18px; padding:16px; font:inherit; font-size:17px; font-weight:700; color:#fff; background:var(--accent); border:none; border-radius:14px; cursor:pointer; }
 .back{ margin-top:20px; background:none; border:none; color:var(--accent); font:inherit; font-size:15px; cursor:pointer; text-decoration:underline; }
 .result-name{ font-size:clamp(17px,4.6vw,21px); font-weight:700; margin:14px 0 4px; }
+textarea{ width:100%; font:inherit; font-size:16px; line-height:1.7; padding:12px; border:2px solid #D8D2C4; border-radius:12px; background:#fff; color:var(--ink); margin-top:6px; }
 #copyBtn{ display:block; width:100%; margin-top:14px; padding:17px; font:inherit; font-size:17px; font-weight:700; color:#fff; background:var(--accent); border:none; border-radius:14px; cursor:pointer; }
 </style>
 </head>
@@ -103,10 +104,9 @@ function screen2(){
   const variants = [["person","A"],["person","B"],["person","C"],["bottles","B"],["bottles","C"]];
   let cards = variants.map(v=>heroCard(f, t, v[0], v[1], `decide('${v[0]}','${v[1]}')`)).join("");
   area.innerHTML = `<div class="q">同じ雰囲気で、写真と組み立てを変えた見本です</div>`
-    + heroHTML(f, t, "bottles", "A", false)
-    + `<p class="sub">下に、変えた見本が5つあります。気に入ったものを押してください。なければ、一番下のボタンで今の見本のまま決められます。</p>`
+    + `<p class="sub">変えた見本が5つあります。気に入ったものを押してください。なければ、一番下のボタンで、最初に選んだ見本のまま決められます。</p>`
     + `<div class="grid">${cards}</div>`
-    + `<button class="decide" onclick="decide('bottles','A')">今の見本のまま決定する</button>`
+    + `<button class="decide" onclick="decide('bottles','A')">最初に選んだ見本のまま決定する</button>`
     + `<button class="back" onclick="screen1()">← 最初の見本に戻る</button>`;
   window.scrollTo(0,0);
 }
@@ -115,14 +115,15 @@ function decide(img, lay){
   area.innerHTML = `<div class="q">これに決めました</div>`
     + heroHTML(sel.fam, sel.tone, sel.img, sel.lay, true)
     + `<div class="result-name">${patName(sel.fam, sel.tone, sel.img, sel.lay)}</div>`
-    + `<p class="sub">下のボタンを押すと、返信文がコピーされます。そのままLINEやメールに貼って送ってください。ひとこと書き加えたい場合は、文の最後の「追記」の下にお書きください。</p>`
-    + `<button id="copyBtn" onclick="doCopy()">返信文をコピーする</button>`
+    + `<p class="sub">送る文章はこれです。ひとこと書き加えたい場合は、「追記」の下にそのまま書けます。書けたら、下のボタンでコピーして、LINEやメールに貼って送ってください。</p>`
+    + `<textarea id="replyText" rows="8"></textarea>`
+    + `<button id="copyBtn" onclick="doCopy()">この文章をコピーする</button>`
     + `<br><button class="back" onclick="screen1()">最初から選び直す</button>`;
+  document.getElementById("replyText").value = ["フェアリーズのサイトのパターンについて", "希望は「" + patName(sel.fam, sel.tone, sel.img, sel.lay) + "」です。", "この方向性でお願いします。", "――追記――", ""].join("\n");
   window.scrollTo(0,0);
 }
 function doCopy(){
-  const name = patName(sel.fam, sel.tone, sel.img, sel.lay);
-  const txt = `フェアリーズのサイトのパターンについて\n希望は「${name}」です。\nこの方向性でお願いします。\n――追記――\n（ご希望があれば、この下にお書きください）`;
+  const txt = document.getElementById("replyText").value;
   if (navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(txt).then(()=>alert("コピーしました。LINEやメールに貼って送ってください。"));
   } else { prompt("この文をコピーしてください", txt); }
