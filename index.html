@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAIRIES サイト パターン見本</title>
+<style>
+  :root{ --ink:#333; }
+  *{ box-sizing:border-box; }
+  body{ font-family:"Hiragino Maru Gothic ProN","M PLUS Rounded 1c",sans-serif; margin:0; background:#faf7f2; color:var(--ink); }
+  header{ padding:20px 16px 8px; max-width:960px; margin:0 auto; }
+  h1{ font-size:22px; margin:0 0 8px; }
+  .lead{ font-size:16px; line-height:1.7; margin:0 0 4px; }
+  .sub{ font-size:14px; color:#666; }
+  .filters{ position:sticky; top:0; background:#faf7f2; padding:10px 16px; border-bottom:1px solid #e3ddd2; z-index:5; }
+  .frow{ max-width:960px; margin:0 auto 8px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .flabel{ font-size:15px; font-weight:bold; width:64px; }
+  .fbtn{ font-size:16px; padding:12px 16px; border-radius:999px; border:2px solid #bbb; background:#fff; min-height:52px; cursor:pointer; }
+  .fbtn.on{ border-color:#333; background:#333; color:#fff; }
+  .count{ max-width:960px; margin:0 auto; font-size:15px; color:#555; }
+  main{ max-width:960px; margin:0 auto; padding:16px; }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; }
+  .tile{ background:#fff; border:2px solid #ddd; border-radius:12px; overflow:hidden; cursor:pointer; }
+  .tile.sel{ border-color:#C9A227; box-shadow:0 0 0 3px #f3e2ac; }
+  .hero{ height:120px; position:relative; overflow:hidden; }
+  .zone{ position:absolute; display:flex; align-items:center; justify-content:center; text-align:center; padding:3px; font-size:10px; line-height:1.35; }
+  .pname{ padding:8px 10px; font-size:14px; display:flex; justify-content:space-between; align-items:center; }
+  .badge{ font-size:12px; background:#C9A227; color:#fff; border-radius:999px; padding:2px 8px; display:none; }
+  .tile.sel .badge{ display:inline-block; }
+  /* lightbox */
+  .lb{ position:fixed; inset:0; background:rgba(0,0,0,.72); display:none; z-index:20; padding:18px; }
+  .lb.open{ display:block; }
+  .lbcard{ background:#fff; border-radius:14px; max-width:560px; margin:4vh auto; padding:16px; }
+  .lbhero{ height:300px; position:relative; overflow:hidden; border-radius:10px; border:1px solid #ccc; }
+  .lbhero .zone{ font-size:15px; }
+  .lbbtns{ display:flex; gap:10px; margin-top:14px; }
+  .bigbtn{ flex:1; font-size:17px; padding:14px; border-radius:999px; border:2px solid #333; background:#fff; min-height:56px; cursor:pointer; }
+  .bigbtn.primary{ background:#333; color:#fff; }
+  footer{ max-width:960px; margin:0 auto; padding:8px 16px 40px; }
+  #copyBtn{ width:100%; font-size:17px; padding:16px; border-radius:999px; border:none; background:#C9A227; color:#fff; min-height:60px; cursor:pointer; }
+  #selInfo{ font-size:15px; margin-bottom:10px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>FAIRIES サイト パターン見本</h1>
+  <p class="lead">新しいホームページの「顔」の候補です。ご自身のイメージに近いものを選んでください。</p>
+  <p class="sub">これは叩き台です。文字・色・雰囲気・画像は、後からご希望に合わせてすべて変えられます。気に入ったものは3つまで選べます。</p>
+</header>
+
+<div class="filters">
+  <div class="frow" id="fFam"><span class="flabel">系統</span></div>
+  <div class="frow" id="fTone"><span class="flabel">濃淡</span></div>
+  <div class="frow" id="fLay"><span class="flabel">組立</span></div>
+  <div class="count" id="count"></div>
+</div>
+
+<main><div class="grid" id="grid"></div></main>
+
+<footer>
+  <div id="selInfo">選んだもの： まだありません</div>
+  <button id="copyBtn">選んだ番号をコピーする</button>
+  <p class="sub">コピーした文を、そのままLINEやメールでお送りください。</p>
+</footer>
+
+<div class="lb" id="lb">
+  <div class="lbcard">
+    <div class="lbhero" id="lbHero"></div>
+    <p id="lbName" style="font-size:16px;margin:12px 0 0"></p>
+    <div class="lbbtns">
+      <button class="bigbtn" id="lbClose">閉じる</button>
+      <button class="bigbtn primary" id="lbPick">これにする</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const FAMS = {
+  1:{name:"ポスター系", light:{bg:"#FDEEF3", photo:"#F7C8D8", band:"#7FB2E5", ink:"#333"}, dark:{bg:"#7A1F3D", photo:"#A63A5C", band:"#3E5F8A", ink:"#FFF"}},
+  2:{name:"ボトル系",   light:{bg:"#FFFFFF", photo:"#DDE3E9", band:"#C0C6CE", ink:"#44505C"}, dark:{bg:"#39424D", photo:"#59636E", band:"#22282F", ink:"#FFF"}},
+  3:{name:"大人シック", light:{bg:"#FFFFFF", photo:"#D9D9D9", band:"#111111", ink:"#111"}, dark:{bg:"#111111", photo:"#3A3A3A", band:"#000000", ink:"#FFF"}},
+  4:{name:"派手系",     light:{bg:"#FFF3E4", photo:"#F2A0BC", band:"#D6336C", ink:"#5C2140"}, dark:{bg:"#8E1440", photo:"#B51E55", band:"#5E0D2B", ink:"#FFF"}},
+  5:{name:"ナチュラル", light:{bg:"#F5EFE0", photo:"#D9C7A7", band:"#8A9A5B", ink:"#4A4436"}, dark:{bg:"#4C5A2E", photo:"#68763F", band:"#333F1F", ink:"#FFF"}}
+};
+const LAYS = { A:"左右分割", B:"全面写真", C:"商品中心" };
+const TONES = { light:"薄い", dark:"濃い" };
+const CATCH = "お肌、本来の力を<br>サポート";
+const patterns = [];
+let n = 0;
+for (const f of [1,2,3,4,5]) for (const l of ["A","B","C"]) for (const t of ["light","dark"]) {
+  n++; patterns.push({ no:n, fam:f, lay:l, tone:t, name:`No.${n} ${FAMS[f].name}・${LAYS[l]}・${TONES[t]}` });
+}
+function heroHTML(p, big){
+  const c = FAMS[p.fam][p.tone];
+  const photoTxt = big ? "顔写真" : "";
+  if (p.lay==="A") return `<div class="zone" style="left:0;top:0;width:54%;height:100%;background:${c.bg};color:${c.ink}">${CATCH}</div><div class="zone" style="right:0;top:0;width:46%;height:100%;background:${c.photo};color:${c.ink}">${photoTxt}</div>`;
+  if (p.lay==="B") return `<div class="zone" style="left:0;top:0;width:100%;height:100%;background:${c.photo};color:${c.ink}">${photoTxt}</div><div class="zone" style="left:0;bottom:0;width:100%;height:36%;background:${c.band};color:#FFF">${CATCH}</div>`;
+  return `<div class="zone" style="left:0;top:0;width:100%;height:32%;background:${c.bg};color:${c.ink}">${CATCH}</div><div class="zone" style="left:0;bottom:0;width:100%;height:68%;background:${c.photo};color:${c.ink}">${big?"ボトル3本":""}</div>`;
+}
+const state = { fam:0, tone:"all", lay:"all", sel:[], cur:null };
+function mkBtn(label, on, fn){ const b=document.createElement("button"); b.className="fbtn"+(on?" on":""); b.textContent=label; b.onclick=fn; return b; }
+function renderFilters(){
+  const ff=document.getElementById("fFam"); ff.querySelectorAll("button").forEach(b=>b.remove());
+  ff.appendChild(mkBtn("すべて", state.fam===0, ()=>{state.fam=0; sync();}));
+  for (const f of [1,2,3,4,5]) ff.appendChild(mkBtn(FAMS[f].name, state.fam===f, ()=>{state.fam=f; sync();}));
+  const ft=document.getElementById("fTone"); ft.querySelectorAll("button").forEach(b=>b.remove());
+  ft.appendChild(mkBtn("両方", state.tone==="all", ()=>{state.tone="all"; sync();}));
+  ft.appendChild(mkBtn("薄い", state.tone==="light", ()=>{state.tone="light"; sync();}));
+  ft.appendChild(mkBtn("濃い", state.tone==="dark", ()=>{state.tone="dark"; sync();}));
+  const fl=document.getElementById("fLay"); fl.querySelectorAll("button").forEach(b=>b.remove());
+  fl.appendChild(mkBtn("すべて", state.lay==="all", ()=>{state.lay="all"; sync();}));
+  for (const l of ["A","B","C"]) fl.appendChild(mkBtn(LAYS[l], state.lay===l, ()=>{state.lay=l; sync();}));
+}
+function renderGrid(){
+  const g=document.getElementById("grid"); g.innerHTML="";
+  const list = patterns.filter(p => (state.fam===0||p.fam===state.fam) && (state.tone==="all"||p.tone===state.tone) && (state.lay==="all"||p.lay===state.lay));
+  document.getElementById("count").textContent = `表示中： ${list.length}件`;
+  for (const p of list){
+    const d=document.createElement("div"); d.className="tile"+(state.sel.includes(p.no)?" sel":"");
+    d.innerHTML=`<div class="hero">${heroHTML(p,false)}</div><div class="pname"><span>${p.name}</span><span class="badge">選択中</span></div>`;
+    d.onclick=()=>{ state.cur=p; document.getElementById("lbHero").innerHTML=heroHTML(p,true); document.getElementById("lbName").textContent=p.name; document.getElementById("lbPick").textContent = state.sel.includes(p.no)?"選択を取り消す":"これにする"; document.getElementById("lb").classList.add("open"); };
+    g.appendChild(d);
+  }
+  const si=document.getElementById("selInfo");
+  si.textContent = state.sel.length ? `選んだもの： ${state.sel.map(x=>"No."+x).join("、")}` : "選んだもの： まだありません";
+}
+function sync(){ renderFilters(); renderGrid(); }
+document.getElementById("lbClose").onclick=()=>document.getElementById("lb").classList.remove("open");
+document.getElementById("lbPick").onclick=()=>{
+  const no=state.cur.no;
+  if (state.sel.includes(no)) state.sel=state.sel.filter(x=>x!==no);
+  else { if (state.sel.length>=3){ alert("選べるのは3つまでです。"); return; } state.sel.push(no); }
+  document.getElementById("lb").classList.remove("open"); renderGrid();
+};
+document.getElementById("copyBtn").onclick=async()=>{
+  if (!state.sel.length){ alert("まだ選ばれていません。"); return; }
+  const txt = `FAIRIES パターンの希望です： ${state.sel.map(x=>"No."+x).join("、")}`;
+  try{ await navigator.clipboard.writeText(txt); alert("コピーしました。そのままLINEやメールに貼って送ってください。"); }
+  catch(e){ prompt("この文をコピーしてください", txt); }
+};
+sync();
+</script>
+</body>
+</html>
