@@ -119,6 +119,7 @@ function decide(img, lay){
     + `<p class="sub">送る文章はこれです。ひとこと書き加えたい場合は、「追記」の下にそのまま書けます。書けたら、下のボタンでコピーして、LINEやメールに貼って送ってください。</p>`
     + `<textarea id="replyText" rows="8"></textarea>`
     + `<button id="copyBtn" onclick="doCopy()">この文章をコピーする</button>`
+    + `<br><button class="back" onclick="screen2()">← 一つ前に戻る（写真と組み立てを選び直す）</button>`
     + `<br><button class="back" onclick="screen1()">最初から選び直す</button>`;
   document.getElementById("replyText").value = ["フェアリーズのサイトのパターンについて", "希望は「" + patName(sel.fam, sel.tone, sel.img, sel.lay) + "」です。", "この方向性でお願いします。", "――追記――", ""].join("\n");
   window.scrollTo(0,0);
