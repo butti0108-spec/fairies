@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FAIRIES サイト パターン見本</title>
 <style>
-  :root{ --ink:#333; }
   *{ box-sizing:border-box; }
-  body{ font-family:"Hiragino Maru Gothic ProN","M PLUS Rounded 1c",sans-serif; margin:0; background:#faf7f2; color:var(--ink); }
+  body{ font-family:"Hiragino Maru Gothic ProN","M PLUS Rounded 1c",sans-serif; margin:0; background:#faf7f2; color:#333; }
   header{ padding:20px 16px 8px; max-width:960px; margin:0 auto; }
   h1{ font-size:22px; margin:0 0 8px; }
   .lead{ font-size:16px; line-height:1.7; margin:0 0 4px; }
@@ -19,20 +18,43 @@
   .fbtn.on{ border-color:#333; background:#333; color:#fff; }
   .count{ max-width:960px; margin:0 auto; font-size:15px; color:#555; }
   main{ max-width:960px; margin:0 auto; padding:16px; }
-  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:16px; }
   .tile{ background:#fff; border:2px solid #ddd; border-radius:12px; overflow:hidden; cursor:pointer; }
   .tile.sel{ border-color:#C9A227; box-shadow:0 0 0 3px #f3e2ac; }
-  .hero{ height:120px; position:relative; overflow:hidden; }
-  .zone{ position:absolute; display:flex; align-items:center; justify-content:center; text-align:center; padding:3px; font-size:10px; line-height:1.35; }
   .pname{ padding:8px 10px; font-size:14px; display:flex; justify-content:space-between; align-items:center; }
   .badge{ font-size:12px; background:#C9A227; color:#fff; border-radius:999px; padding:2px 8px; display:none; }
   .tile.sel .badge{ display:inline-block; }
+  /* --- hero mock --- */
+  .hero{ height:190px; position:relative; overflow:hidden; }
+  .hero.big{ height:340px; }
+  .nav{ position:absolute; left:0; top:0; width:100%; height:11%; min-height:14px; display:flex; align-items:center; justify-content:space-between; padding:0 6%; z-index:3; }
+  .logo{ font-weight:bold; letter-spacing:.18em; font-size:10px; }
+  .hero.big .logo{ font-size:15px; }
+  .menu{ font-size:8px; opacity:.75; letter-spacing:.1em; }
+  .hero.big .menu{ font-size:12px; }
+  .body{ position:absolute; left:0; top:11%; width:100%; height:89%; }
+  .catch{ font-weight:bold; line-height:1.45; font-size:13px; }
+  .hero.big .catch{ font-size:24px; }
+  .sub2{ font-size:8px; opacity:.85; line-height:1.5; margin-top:4px; }
+  .hero.big .sub2{ font-size:14px; }
+  .btn{ display:inline-block; margin-top:7px; padding:3px 10px; border-radius:999px; font-size:8px; border:1px solid currentColor; }
+  .hero.big .btn{ font-size:13px; padding:6px 16px; }
+  .photo{ position:absolute; overflow:hidden; }
+  .photo::before{ content:""; position:absolute; left:50%; top:16%; width:34%; aspect-ratio:1; border-radius:50%; transform:translateX(-50%); background:rgba(255,255,255,.55); }
+  .photo::after{ content:""; position:absolute; left:50%; bottom:-24%; width:78%; aspect-ratio:1.15; border-radius:50% 50% 0 0; transform:translateX(-50%); background:rgba(255,255,255,.55); }
+  .bottles{ position:absolute; left:0; bottom:8%; width:100%; display:flex; justify-content:center; align-items:flex-end; gap:7%; }
+  .bottle{ width:11%; position:relative; }
+  .bottle .cap{ height:10px; background:linear-gradient(180deg,#e8ecf0,#aeb6bf); border-radius:2px 2px 0 0; margin:0 22%; }
+  .bottle .bd{ height:56px; background:linear-gradient(160deg,#ffffff,#d7dde3); border:1px solid #b9c1c9; border-radius:6px 6px 8px 8px; position:relative; }
+  .hero.big .bottle .bd{ height:110px; }
+  .hero.big .bottle .cap{ height:18px; }
+  .bottle .bd::after{ content:"FAIRIES"; position:absolute; left:0; top:38%; width:100%; text-align:center; font-size:5px; letter-spacing:.08em; color:#7b8794; }
+  .hero.big .bottle .bd::after{ font-size:9px; }
+  .shelf{ position:absolute; left:8%; bottom:5%; width:84%; height:2px; background:rgba(0,0,0,.18); }
   /* lightbox */
-  .lb{ position:fixed; inset:0; background:rgba(0,0,0,.72); display:none; z-index:20; padding:18px; }
+  .lb{ position:fixed; inset:0; background:rgba(0,0,0,.72); display:none; z-index:20; padding:18px; overflow:auto; }
   .lb.open{ display:block; }
   .lbcard{ background:#fff; border-radius:14px; max-width:560px; margin:4vh auto; padding:16px; }
-  .lbhero{ height:300px; position:relative; overflow:hidden; border-radius:10px; border:1px solid #ccc; }
-  .lbhero .zone{ font-size:15px; }
   .lbbtns{ display:flex; gap:10px; margin-top:14px; }
   .bigbtn{ flex:1; font-size:17px; padding:14px; border-radius:999px; border:2px solid #333; background:#fff; min-height:56px; cursor:pointer; }
   .bigbtn.primary{ background:#333; color:#fff; }
@@ -65,7 +87,7 @@
 
 <div class="lb" id="lb">
   <div class="lbcard">
-    <div class="lbhero" id="lbHero"></div>
+    <div id="lbHero"></div>
     <p id="lbName" style="font-size:16px;margin:12px 0 0"></p>
     <div class="lbbtns">
       <button class="bigbtn" id="lbClose">閉じる</button>
@@ -76,15 +98,14 @@
 
 <script>
 const FAMS = {
-  1:{name:"ポスター系", light:{bg:"#FDEEF3", photo:"#F7C8D8", band:"#7FB2E5", ink:"#333"}, dark:{bg:"#7A1F3D", photo:"#A63A5C", band:"#3E5F8A", ink:"#FFF"}},
-  2:{name:"ボトル系",   light:{bg:"#FFFFFF", photo:"#DDE3E9", band:"#C0C6CE", ink:"#44505C"}, dark:{bg:"#39424D", photo:"#59636E", band:"#22282F", ink:"#FFF"}},
-  3:{name:"大人シック", light:{bg:"#FFFFFF", photo:"#D9D9D9", band:"#111111", ink:"#111"}, dark:{bg:"#111111", photo:"#3A3A3A", band:"#000000", ink:"#FFF"}},
-  4:{name:"派手系",     light:{bg:"#FFF3E4", photo:"#F2A0BC", band:"#D6336C", ink:"#5C2140"}, dark:{bg:"#8E1440", photo:"#B51E55", band:"#5E0D2B", ink:"#FFF"}},
-  5:{name:"ナチュラル", light:{bg:"#F5EFE0", photo:"#D9C7A7", band:"#8A9A5B", ink:"#4A4436"}, dark:{bg:"#4C5A2E", photo:"#68763F", band:"#333F1F", ink:"#FFF"}}
+  1:{name:"ポスター系", light:{bg:"#FDEEF3", photo:"linear-gradient(150deg,#F9D3E0,#F2A9C0)", band:"#7FB2E5", ink:"#4A2B38", accent:"#C9A227"}, dark:{bg:"#7A1F3D", photo:"linear-gradient(150deg,#B5506F,#8E2A4C)", band:"#33517A", ink:"#FFF", accent:"#E7CD7E"}},
+  2:{name:"ボトル系",   light:{bg:"#FFFFFF", photo:"linear-gradient(150deg,#EDF1F5,#CBD3DB)", band:"#98A2AC", ink:"#3D4854", accent:"#8A94A0"}, dark:{bg:"#39424D", photo:"linear-gradient(150deg,#5B6672,#454F59)", band:"#22282F", ink:"#FFF", accent:"#C0C6CE"}},
+  3:{name:"大人シック", light:{bg:"#FFFFFF", photo:"linear-gradient(150deg,#E4E4E4,#C6C6C6)", band:"#111111", ink:"#111", accent:"#111"}, dark:{bg:"#111111", photo:"linear-gradient(150deg,#4A4A4A,#2C2C2C)", band:"#000000", ink:"#FFF", accent:"#FFF"}},
+  4:{name:"派手系",     light:{bg:"#FFF3E4", photo:"linear-gradient(150deg,#F6B8CD,#EE82A9)", band:"#D6336C", ink:"#5C2140", accent:"#C9A227"}, dark:{bg:"#8E1440", photo:"linear-gradient(150deg,#C22A60,#9C1748)", band:"#5E0D2B", ink:"#FFF", accent:"#E7CD7E"}},
+  5:{name:"ナチュラル", light:{bg:"#F5EFE0", photo:"linear-gradient(150deg,#E7DCC0,#D9C7A7)", band:"#8A9A5B", ink:"#4A4436", accent:"#8A9A5B"}, dark:{bg:"#4C5A2E", photo:"linear-gradient(150deg,#76854A,#5A6B38)", band:"#333F1F", ink:"#FFF", accent:"#D9C7A7"}}
 };
 const LAYS = { A:"左右分割", B:"全面写真", C:"商品中心" };
 const TONES = { light:"薄い", dark:"濃い" };
-const CATCH = "お肌、本来の力を<br>サポート";
 const patterns = [];
 let n = 0;
 for (const f of [1,2,3,4,5]) for (const l of ["A","B","C"]) for (const t of ["light","dark"]) {
@@ -92,10 +113,13 @@ for (const f of [1,2,3,4,5]) for (const l of ["A","B","C"]) for (const t of ["li
 }
 function heroHTML(p, big){
   const c = FAMS[p.fam][p.tone];
-  const photoTxt = big ? "顔写真" : "";
-  if (p.lay==="A") return `<div class="zone" style="left:0;top:0;width:54%;height:100%;background:${c.bg};color:${c.ink}">${CATCH}</div><div class="zone" style="right:0;top:0;width:46%;height:100%;background:${c.photo};color:${c.ink}">${photoTxt}</div>`;
-  if (p.lay==="B") return `<div class="zone" style="left:0;top:0;width:100%;height:100%;background:${c.photo};color:${c.ink}">${photoTxt}</div><div class="zone" style="left:0;bottom:0;width:100%;height:36%;background:${c.band};color:#FFF">${CATCH}</div>`;
-  return `<div class="zone" style="left:0;top:0;width:100%;height:32%;background:${c.bg};color:${c.ink}">${CATCH}</div><div class="zone" style="left:0;bottom:0;width:100%;height:68%;background:${c.photo};color:${c.ink}">${big?"ボトル3本":""}</div>`;
+  const nav = `<div class="nav" style="color:${c.ink}"><span class="logo">FAIRIES</span><span class="menu">コンセプト　商品紹介　お問い合わせ</span></div>`;
+  const txt = `<div class="catch">お肌、本来の力を<br>サポート</div><div class="sub2">潤い続く、ハリ・ツヤのあるお肌へ。<br>MADE IN JAPAN</div><span class="btn" style="color:${c.accent};border-color:${c.accent}">詳しく見る</span>`;
+  let body = "";
+  if (p.lay==="A") body = `<div style="position:absolute;left:0;top:0;width:55%;height:100%;padding:7% 4% 0 6%;color:${c.ink}">${txt}</div><div class="photo" style="right:0;top:0;width:45%;height:100%;background:${c.photo}"></div>`;
+  else if (p.lay==="B") body = `<div class="photo" style="left:0;top:0;width:100%;height:100%;background:${c.photo}"></div><div style="position:absolute;left:0;bottom:0;width:100%;padding:4% 6%;background:${c.band};color:#FFF"><div class="catch">お肌、本来の力をサポート</div><div class="sub2">潤い続く、ハリ・ツヤのあるお肌へ</div></div>`;
+  else body = `<div style="position:absolute;left:0;top:0;width:100%;height:100%;padding-top:5%;text-align:center;color:${c.ink}"><div class="catch">お肌、本来の力をサポート</div><div class="sub2">プレミアムエイジングケアライン</div></div><div class="bottles"><div class="bottle"><div class="cap"></div><div class="bd"></div></div><div class="bottle"><div class="cap"></div><div class="bd"></div></div><div class="bottle"><div class="cap"></div><div class="bd"></div></div></div><div class="shelf"></div>`;
+  return `<div class="hero${big?" big":""}" style="background:${c.bg}">${nav}<div class="body">${body}</div></div>`;
 }
 const state = { fam:0, tone:"all", lay:"all", sel:[], cur:null };
 function mkBtn(label, on, fn){ const b=document.createElement("button"); b.className="fbtn"+(on?" on":""); b.textContent=label; b.onclick=fn; return b; }
@@ -117,7 +141,7 @@ function renderGrid(){
   document.getElementById("count").textContent = `表示中： ${list.length}件`;
   for (const p of list){
     const d=document.createElement("div"); d.className="tile"+(state.sel.includes(p.no)?" sel":"");
-    d.innerHTML=`<div class="hero">${heroHTML(p,false)}</div><div class="pname"><span>${p.name}</span><span class="badge">選択中</span></div>`;
+    d.innerHTML=`${heroHTML(p,false)}<div class="pname"><span>${p.name}</span><span class="badge">選択中</span></div>`;
     d.onclick=()=>{ state.cur=p; document.getElementById("lbHero").innerHTML=heroHTML(p,true); document.getElementById("lbName").textContent=p.name; document.getElementById("lbPick").textContent = state.sel.includes(p.no)?"選択を取り消す":"これにする"; document.getElementById("lb").classList.add("open"); };
     g.appendChild(d);
   }
