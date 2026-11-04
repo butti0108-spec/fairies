@@ -36,6 +36,7 @@ h1{ font-size:clamp(22px,5.4vw,30px); margin:4px 0 8px; }
 .pname{ font-size:11px; letter-spacing:.2em; opacity:.85; }
 .btn{ display:inline-block; padding:8px 18px; border-radius:999px; font-size:13px; font-weight:700; }
 .decide{ display:block; width:100%; margin:0 0 18px; padding:16px; font:inherit; font-size:17px; font-weight:700; color:#fff; background:var(--accent); border:none; border-radius:14px; cursor:pointer; }
+.back.top{ margin:0 0 6px; }
 .back{ margin-top:20px; background:none; border:none; color:var(--accent); font:inherit; font-size:15px; cursor:pointer; text-decoration:underline; }
 .result-name{ font-size:clamp(17px,4.6vw,21px); font-weight:700; margin:14px 0 4px; }
 textarea{ width:100%; font:inherit; font-size:16px; line-height:1.7; padding:12px; border:2px solid #D8D2C4; border-radius:12px; background:#fff; color:var(--ink); margin-top:6px; }
@@ -103,7 +104,7 @@ function screen2(){
   const f = base.fam, t = base.tone;
   const variants = [["person","A"],["person","B"],["person","C"],["bottles","B"],["bottles","C"]];
   let cards = variants.map(v=>heroCard(f, t, v[0], v[1], `decide('${v[0]}','${v[1]}')`)).join("");
-  area.innerHTML = `<div class="q">同じ雰囲気で、写真と組み立てを変えた見本です</div>`
+  area.innerHTML = `<button class="back top" onclick="screen1()">← 最初の見本に戻る</button><div class="q">同じ雰囲気で、写真と組み立てを変えた見本です</div>`
     + `<p class="sub">変えた見本が5つあります。気に入ったものを押してください。なければ、一番下のボタンで、最初に選んだ見本のまま決められます。</p>`
     + `<div class="grid">${cards}</div>`
     + `<button class="decide" onclick="decide('bottles','A')">最初に選んだ見本のまま決定する</button>`
