@@ -94,7 +94,7 @@ function screen1(){
   [1,2,3,4,5].forEach(f=>{ ["light","dark"].forEach(t=>{
     cards += heroCard(f, t, "bottles", "A", `pickBase(${f},'${t}')`);
   });});
-  area.innerHTML = `<div class="q">まず、好きな見た目を一つ押してください</div><div class="grid">${cards}</div>`;
+  area.innerHTML = `<div class="q">まず、好きな色の見本を一つ押してください</div><div class="grid">${cards}</div>`;
   window.scrollTo(0,0);
 }
 function pickBase(f, t){ base = {fam:f, tone:t}; screen2(); }
@@ -104,8 +104,9 @@ function screen2(){
   let cards = variants.map(v=>heroCard(f, t, v[0], v[1], `decide('${v[0]}','${v[1]}')`)).join("");
   area.innerHTML = `<div class="q">同じ雰囲気で、写真と組み立てを変えた見本です</div>`
     + heroHTML(f, t, "bottles", "A", false)
-    + `<button class="decide" onclick="decide('bottles','A')">この見本のまま決定する</button>`
+    + `<p class="sub">下に、変えた見本が5つあります。気に入ったものを押してください。なければ、一番下のボタンで今の見本のまま決められます。</p>`
     + `<div class="grid">${cards}</div>`
+    + `<button class="decide" onclick="decide('bottles','A')">今の見本のまま決定する</button>`
     + `<button class="back" onclick="screen1()">← 最初の見本に戻る</button>`;
   window.scrollTo(0,0);
 }
