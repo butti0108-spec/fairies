@@ -113,7 +113,7 @@ function screen2(){
 function decide(img, lay){
   sel = { fam: base.fam, tone: base.tone, img: img, lay: lay };
   area.innerHTML = `<div class="q">これに決めました</div>`
-    + heroHTML(sel.fam, sel.tone, sel.img, sel.lay, true)
+    + heroHTML(sel.fam, sel.tone, sel.img, sel.lay, false)
     + `<div class="result-name">${patName(sel.fam, sel.tone, sel.img, sel.lay)}</div>`
     + `<p class="sub">送る文章はこれです。ひとこと書き加えたい場合は、「追記」の下にそのまま書けます。書けたら、下のボタンでコピーして、LINEやメールに貼って送ってください。</p>`
     + `<textarea id="replyText" rows="8"></textarea>`
