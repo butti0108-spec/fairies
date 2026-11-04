@@ -73,7 +73,7 @@
 <div class="filters">
   <div class="frow" id="fFam"><span class="flabel">系統</span></div>
   <div class="frow" id="fTone"><span class="flabel">濃淡</span></div>
-  <div class="frow" id="fLay"><span class="flabel">組立</span></div>
+  <div class="frow" id="fLay"><span class="flabel">組立順</span></div>
   <div class="count" id="count"></div>
 </div>
 
@@ -139,7 +139,8 @@ function renderFilters(){
 }
 function renderGrid(){
   const g=document.getElementById("grid"); g.innerHTML="";
-  const list = patterns.filter(p => (state.fam===0||p.fam===state.fam) && (state.tone==="all"||p.tone===state.tone) && (state.lay==="all"||p.lay===state.lay));
+  const list = patterns.filter(p => (state.fam===0||p.fam===state.fam) && (state.tone==="all"||p.tone===state.tone));
+  if (state.lay!=="all") list.sort((a,b)=> (b.lay===state.lay) - (a.lay===state.lay));
   document.getElementById("count").textContent = `表示中： ${list.length}件`;
   for (const p of list){
     const d=document.createElement("div"); d.className="tile"+(state.sel.includes(p.no)?" sel":"");
